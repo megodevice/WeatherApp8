@@ -1,97 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_sunny"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.fragments.WeatherFragment">
 
     <ImageView
-        android:layout_centerInParent="true"
-        android:src="@mipmap/ic_image_sunny"
-        android:scaleType="fitCenter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:importantForAccessibility="no" />
+        android:layout_centerInParent="true"
+        android:importantForAccessibility="no"
+        android:paddingHorizontal="29dp"
+        android:paddingBottom="70dp"
+        android:scaleType="fitCenter"
+        android:src="@mipmap/ic_image_sunny" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <TextView
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_width="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="34dp"
-            tools:text="Today"
             android:id="@+id/tv_day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="34dp"
             android:textSize="16sp"
-            android:layout_height="wrap_content"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Today" />
 
         <TextView
-            android:layout_marginEnd="-30dp"
-            android:layout_marginTop="-30dp"
-            app:layout_constraintTop_toBottomOf="@id/tv_day"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:text="28°"
-            android:textSize="200sp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-30dp"
+            android:layout_marginEnd="-30dp"
+            android:textSize="200sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_day"
+            tools:text="28°" />
 
         <ImageView
             android:id="@+id/iv_icon_location"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:src="@mipmap/ic_icon_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:importantForAccessibility="no" />
+            android:importantForAccessibility="no"
+            android:src="@mipmap/ic_icon_location"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/tv_city_initial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="-40dp"
+            android:fontFamily="sans-serif-thin"
             android:textSize="178sp"
-            tools:text="JKT"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_icon_location"
+            tools:text="JKT" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            tools:listitem="@layout/item_weather"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginBottom="38dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_icon_location"
-            android:layout_width="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/tv_city_full"
+            tools:itemCount="10"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:layout_height="wrap_content"/>
 
         <ImageView
             android:id="@+id/iv_arrow_left"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:src="@mipmap/ic_arrow_left"
-            android:layout_marginStart="24dp"
-            android:layout_marginBottom="24dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:importantForAccessibility="no" />
+            android:layout_marginStart="24dp"
+            android:layout_marginBottom="24dp"
+            android:importantForAccessibility="no"
+            android:src="@mipmap/ic_arrow_left"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <ImageView
             android:id="@+id/iv_arrow_right"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:src="@mipmap/ic_arrow_right"
-            android:layout_marginEnd="24dp"
-            android:layout_marginBottom="24dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:importantForAccessibility="no" />
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="24dp"
+            android:importantForAccessibility="no"
+            android:src="@mipmap/ic_arrow_right"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="6dp"
-            app:layout_constraintTop_toTopOf="@id/iv_arrow_left"
-            tools:text="Jakarta"
+            android:id="@+id/tv_city_full"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/iv_arrow_left"
+            tools:text="Jakarta" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
