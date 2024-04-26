@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_sunny"
-    tools:context=".ui.fragments.WeatherFragment">
+    tools:context=".presentation.fragments.weather.WeatherFragment">
 
     <ImageView
         android:layout_width="match_parent"
@@ -30,9 +30,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Today" />
+            android:text="@string/today" />
 
         <TextView
+            android:id="@+id/tv_temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="-30dp"
@@ -67,6 +68,7 @@
             tools:text="JKT" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_hourly"
             tools:listitem="@layout/item_weather"
             android:layout_width="match_parent"
             android:orientation="horizontal"
