@@ -1,6 +1,6 @@
 package com.ilia_zusik.weatherapp.data.models.hours
 
-data class WeatherStep(
+data class WeatherHourModel(
     val clouds: Clouds,
     val dt: Int,
     val dt_txt: String,

@@ -7,9 +7,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WeatherViewModel @Inject constructor(private val repository: WeatherRepository) : ViewModel() {
-
-    fun getWeather() = repository.fetchWeather()
-
-    fun getHourlyWeather(weatherId: Int) = repository.fetchHourlyWeather(weatherId)
+    fun weather() = repository.weather()
 
 }

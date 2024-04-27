@@ -4,7 +4,7 @@ data class HoursWeatherModel(
     val city: City,
     val cnt: Int,
     val cod: String,
-    val list: List<WeatherStep>,
+    val list: List<WeatherHourModel>,
     val message: Int
 )
 

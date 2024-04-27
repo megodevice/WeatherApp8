@@ -6,22 +6,22 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import com.ilia_zusik.weatherapp.data.models.hours.WeatherStep
+import com.ilia_zusik.weatherapp.data.models.display.DisplayWeatherHourModel
 import com.ilia_zusik.weatherapp.databinding.ItemWeatherBinding
 
 class WeatherHourlyAdapter :
-    ListAdapter<WeatherStep, WeatherHourlyAdapter.WeatherStepViewHolder>(DIFF_UTIL_CALLBACK) {
+    ListAdapter<DisplayWeatherHourModel, WeatherHourlyAdapter.WeatherStepViewHolder>(DIFF_UTIL_CALLBACK) {
 
     private companion object {
-        val DIFF_UTIL_CALLBACK: DiffUtil.ItemCallback<WeatherStep> =
-            object : DiffUtil.ItemCallback<WeatherStep>() {
-                override fun areItemsTheSame(oldItem: WeatherStep, newItem: WeatherStep): Boolean {
-                    return oldItem.dt == newItem.dt
+        val DIFF_UTIL_CALLBACK: DiffUtil.ItemCallback<DisplayWeatherHourModel> =
+            object : DiffUtil.ItemCallback<DisplayWeatherHourModel>() {
+                override fun areItemsTheSame(oldItem: DisplayWeatherHourModel, newItem: DisplayWeatherHourModel): Boolean {
+                    return oldItem.hour == newItem.hour
                 }
 
                 override fun areContentsTheSame(
-                    oldItem: WeatherStep,
-                    newItem: WeatherStep
+                    oldItem: DisplayWeatherHourModel,
+                    newItem: DisplayWeatherHourModel
                 ): Boolean {
                     return oldItem == newItem
                 }
@@ -44,14 +44,12 @@ class WeatherHourlyAdapter :
     inner class WeatherStepViewHolder(private val binding: ItemWeatherBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun onBind(weatherStep: WeatherStep) {
+        fun onBind(hour: DisplayWeatherHourModel) {
             binding.apply {
-                tvTime.text = weatherStep.dt_txt.substring(11, 16)
-                "${(weatherStep.pop * 100).toInt()}%".apply { tvRainPercent.text = this }
-                ivImage.load("https://openweathermap.org/img/wn/"
-                        + weatherStep.weather[0].icon + "@2x.png")
+                tvTime.text = hour.hour
+                tvRainPercent.text = hour.rainPercentage
+                ivImage.load(hour.imageUrl)
             }
         }
-
     }
 }

@@ -6,7 +6,6 @@ import com.ilia_zusik.weatherapp.presentation.adapters.WeatherHourlyAdapter
 import com.ilia_zusik.weatherapp.presentation.fragments.base.BaseFragment
 import com.ilia_zusik.weatherapp.presentation.viewModels.WeatherViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.Locale
 
 @AndroidEntryPoint
 class WeatherFragment : BaseFragment<
@@ -20,24 +19,14 @@ class WeatherFragment : BaseFragment<
 
     override fun observe() = with(binding) {
         super.observe()
-        viewModel.getWeather().resHandler({ isLoading ->
 
-        }, { weatherModel ->
-            tvCityFull.text = weatherModel.name
-            tvCityInitial.text = weatherModel.name.substring(0, 3).uppercase(Locale.ROOT)
-            "${weatherModel.temp.temp.toInt()}°".apply {
-                tvTemp.text = this
-            }
-            setHourlyWeather(weatherModel.id)
+        viewModel.weather().resHandler({}, {weather ->
+            tvCityFull.text = weather.cityName
+            tvCityInitial.text = weather.cityInitial
+            tvTemp.text = weather.temperature
+            adapter.submitList(weather.hourly)
         })
-    }
 
-    private fun setHourlyWeather(weatherId: Int) {
-        viewModel.getHourlyWeather(weatherId).resHandler({ isLoading ->
-
-        }, { hoursWeatherModel ->
-            adapter.submitList(hoursWeatherModel.list)
-        })
     }
 
     override fun initialize() = with(binding) {
