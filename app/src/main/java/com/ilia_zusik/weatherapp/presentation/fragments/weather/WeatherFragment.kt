@@ -24,6 +24,7 @@ class WeatherFragment : BaseFragment<
             tvCityFull.text = weather.cityName
             tvCityInitial.text = weather.cityInitial
             tvTemp.text = weather.temperature
+            tvDay.text = weather.date
             adapter.submitList(weather.hourly)
         })
 

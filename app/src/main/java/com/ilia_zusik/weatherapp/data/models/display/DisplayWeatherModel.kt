@@ -1,6 +1,7 @@
 package com.ilia_zusik.weatherapp.data.models.display
 
 data class DisplayWeatherModel(
+    val date: String,
     val cityName: String,
     val cityInitial: String,
     val temperature: String,

@@ -9,6 +9,8 @@ import com.iliazusik.rickmortyapp.utils.Resource
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 import com.ilia_zusik.weatherapp.data.models.display.DisplayWeatherHourModel
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class WeatherRepository @Inject constructor(private val api: WeatherApi) : BaseRepository() {
@@ -37,15 +39,22 @@ class WeatherRepository @Inject constructor(private val api: WeatherApi) : BaseR
                     } else {
                         emit(Resource.Error("Unsuccessful response: ${responseHourly.code()}"))
                     }
-                    emit(
-                        Resource.Success(
-                            DisplayWeatherModel(
-                                cityName = name,
-                                cityInitial = name.substring(0, 3).uppercase(Locale.ROOT),
-                                temperature = "${temp.temp.toInt()}°",
-                                hourly = dataHourly
+
+                    val result = DisplayWeatherModel(
+                        cityName = name,
+                        cityInitial = name.substring(0, 3).uppercase(Locale.ROOT),
+                        temperature = "${temp.temp.toInt()}°",
+                        hourly = dataHourly,
+                        date = SimpleDateFormat("MM.dd - HH:mm", Locale.ROOT).format(
+                            Date(
+                                dateUnix * 1000 + timeZoneOffset
                             )
                         )
+                    )
+
+
+                    emit(
+                        Resource.Success(result)
                     )
                 }
             } else {

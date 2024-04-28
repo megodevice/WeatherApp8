@@ -19,6 +19,12 @@ data class WeatherModel(
     @SerializedName("name")
     var name: String = String(),
 
+    @SerializedName("dt")
+    var dateUnix: Long = 0,
+
+    @SerializedName("timezone")
+    var timeZoneOffset: Long,
+
     @SerializedName("id")
     var id: Int = 0
 
