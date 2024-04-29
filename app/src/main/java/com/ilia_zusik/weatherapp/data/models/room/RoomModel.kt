@@ -8,6 +8,7 @@ data class RoomWeather(
     val cityName: String,
     val cityInitial: String,
     val temperature: String,
+    @PrimaryKey(autoGenerate = false)
     val dateUnix: Long
 )
 

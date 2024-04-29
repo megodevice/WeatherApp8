@@ -11,21 +11,21 @@ import com.ilia_zusik.weatherapp.data.models.room.RoomWeatherHour
 interface WeatherDao {
 
     @Query("SELECT * FROM weather")
-    fun getWeather()
+    suspend fun getWeather() : RoomWeather?
 
     @Query("SELECT * FROM hours")
-    fun getHourly()
+    suspend fun getHourly() : List<RoomWeatherHour>?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun saveWeather(roomWeather: RoomWeather)
+    suspend fun saveWeather(roomWeather: RoomWeather)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun saveHours(hourly: ArrayList<RoomWeatherHour>)
+    suspend fun saveHours(hourly: ArrayList<RoomWeatherHour>)
 
     @Query("DELETE FROM weather")
-    fun clearWeather()
+    suspend fun clearWeather()
 
     @Query("DELETE FROM hours")
-    fun clearHours()
+    suspend fun clearHours()
 
 }

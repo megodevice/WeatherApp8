@@ -12,16 +12,19 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
 object NetworkModule {
 
     @Provides
+    @Singleton
     fun provideWeatherApi(retrofit: Retrofit): WeatherApi =
         retrofit.create(WeatherApi::class.java)
 
     @Provides
+    @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
         Retrofit.Builder().baseUrl("https://api.openweathermap.org/data/2.5/")
             .addConverterFactory(GsonConverterFactory.create())
@@ -29,6 +32,7 @@ object NetworkModule {
             .build()
 
     @Provides
+    @Singleton
     fun provideKeyInterceptor() = Interceptor {
         val originalRequest = it.request()
         val newHttpUrl = originalRequest.url.newBuilder()
@@ -41,12 +45,14 @@ object NetworkModule {
     }
 
     @Provides
+    @Singleton
     fun provideLoggingInterceptor() =
         HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
     @Provides
+    @Singleton
     fun provideOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
         keyInterceptor: Interceptor
