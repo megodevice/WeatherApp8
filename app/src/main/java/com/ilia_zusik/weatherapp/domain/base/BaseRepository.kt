@@ -2,7 +2,7 @@ package com.ilia_zusik.weatherapp.domain.base
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
-import com.iliazusik.rickmortyapp.utils.Resource
+import com.ilia_zusik.weatherapp.domain.utils.Resource
 import kotlinx.coroutines.Dispatchers
 import retrofit2.Response
 

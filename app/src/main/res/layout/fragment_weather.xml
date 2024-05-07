@@ -21,6 +21,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <com.airbnb.lottie.LottieAnimationView
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:id="@+id/anim_loading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:lottie_rawRes="@raw/anim_loading"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"/>
+
         <TextView
             android:id="@+id/tv_day"
             android:layout_width="wrap_content"
@@ -30,7 +41,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:text="@string/today" />
+            tools:text="@string/today" />
 
         <TextView
             android:id="@+id/tv_temp"

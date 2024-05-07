@@ -59,10 +59,10 @@ object NetworkModule {
     ) =
         OkHttpClient().newBuilder()
             .addNetworkInterceptor(keyInterceptor)
-            .writeTimeout(20, TimeUnit.SECONDS)
-            .readTimeout(20, TimeUnit.SECONDS)
-            .callTimeout(20, TimeUnit.SECONDS)
-            .connectTimeout(20, TimeUnit.SECONDS)
+            .writeTimeout(5, TimeUnit.SECONDS)
+            .readTimeout(5, TimeUnit.SECONDS)
+            .callTimeout(5, TimeUnit.SECONDS)
+            .connectTimeout(5, TimeUnit.SECONDS)
             .addInterceptor(loggingInterceptor)
             .build()
 }

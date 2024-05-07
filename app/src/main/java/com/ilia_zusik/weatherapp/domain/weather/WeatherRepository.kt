@@ -1,20 +1,18 @@
 package com.ilia_zusik.weatherapp.domain.weather
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataScope
-import androidx.lifecycle.liveData
 import com.ilia_zusik.weatherapp.data.models.current.WeatherModel
 import com.ilia_zusik.weatherapp.data.models.display.DisplayWeatherModel
 import com.ilia_zusik.weatherapp.data.remote.WeatherApi
 import com.ilia_zusik.weatherapp.domain.base.BaseRepository
-import com.iliazusik.rickmortyapp.utils.Resource
-import kotlinx.coroutines.Dispatchers
+import com.ilia_zusik.weatherapp.domain.utils.Resource
 import javax.inject.Inject
 import com.ilia_zusik.weatherapp.data.models.display.DisplayWeatherHourModel
 import com.ilia_zusik.weatherapp.data.models.hours.WeatherHourModel
 import com.ilia_zusik.weatherapp.data.models.room.RoomWeather
 import com.ilia_zusik.weatherapp.data.models.room.RoomWeatherHour
 import com.ilia_zusik.weatherapp.data.room.WeatherDao
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -24,14 +22,14 @@ class WeatherRepository @Inject constructor(
     private val dao: WeatherDao
 ) : BaseRepository() {
 
-    fun weather(): LiveData<Resource<DisplayWeatherModel>> = liveData(Dispatchers.IO) {
+    fun weather(cityName: String): Flow<Resource<DisplayWeatherModel>> = flow {
         emit(Resource.Loading())
         try {
-            loadWeather(this)
+            loadWeather { emit(it) }
             // Здесь нужна проверка если прошло мало времени не делать запрос
 
 
-            val response = api.getWeather("Bishkek")
+            val response = api.getWeather(cityName)
             if (response.isSuccessful && response.body() != null && response.code() in 200..300) {
                 with(response.body()!!) {
                     val responseHourly = api.getHourlyWeather(id)
@@ -74,36 +72,35 @@ class WeatherRepository @Inject constructor(
         }
     }
 
-    private suspend fun loadWeather(scope: LiveDataScope<Resource<DisplayWeatherModel>>) =
-        with(scope) {
-            val weather = dao.getWeather()
-            val hourly = dao.getHourly()
-            val hours = ArrayList<DisplayWeatherHourModel>()
-            weather?.let { roomWeather ->
-                hourly?.let { roomHourlyList ->
-                    roomHourlyList.forEach {
-                        hours.add(
-                            DisplayWeatherHourModel(
-                                hour = it.hour,
-                                rainPercentage = it.rainPercentage,
-                                imageUrl = it.imageUrl
-                            )
-                        )
-                    }
-                }
-                emit(
-                    Resource.Success(
-                        DisplayWeatherModel(
-                            date = convertDate(roomWeather.dateUnix),
-                            cityName = roomWeather.cityName,
-                            cityInitial = roomWeather.cityInitial,
-                            temperature = roomWeather.temperature,
-                            hourly = hours
+    private suspend fun loadWeather(emit: suspend (Resource<DisplayWeatherModel>) -> Unit) {
+        val weather = dao.getWeather()
+        val hourly = dao.getHourly()
+        val hours = ArrayList<DisplayWeatherHourModel>()
+        weather?.let { roomWeather ->
+            hourly?.let { roomHourlyList ->
+                roomHourlyList.forEach {
+                    hours.add(
+                        DisplayWeatherHourModel(
+                            hour = it.hour,
+                            rainPercentage = it.rainPercentage,
+                            imageUrl = it.imageUrl
                         )
                     )
-                )
+                }
             }
+            emit(
+                Resource.Success(
+                    DisplayWeatherModel(
+                        date = convertDate(roomWeather.dateUnix),
+                        cityName = roomWeather.cityName,
+                        cityInitial = roomWeather.cityInitial,
+                        temperature = roomWeather.temperature,
+                        hourly = hours
+                    )
+                )
+            )
         }
+    }
 
     private suspend fun saveWeather(weatherModel: WeatherModel, hours: List<WeatherHourModel>?) {
         dao.clearWeather()

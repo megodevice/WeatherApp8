@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.viewbinding.ViewBinding
-import com.iliazusik.rickmortyapp.utils.Resource
+import com.ilia_zusik.weatherapp.domain.utils.Resource
 
 typealias inflater<T> = (LayoutInflater, ViewGroup?, Boolean) -> T
 
