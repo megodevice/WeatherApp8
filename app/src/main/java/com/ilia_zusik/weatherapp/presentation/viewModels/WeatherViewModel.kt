@@ -2,42 +2,35 @@ package com.ilia_zusik.weatherapp.presentation.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ilia_zusik.weatherapp.domain.weather.WeatherRepository
-import com.ilia_zusik.weatherapp.domain.utils.Resource
+import com.ilia_zusik.weatherapp.domain.models.DisplayWeatherModel
+import com.ilia_zusik.weatherapp.domain.usecases.WeatherUseCase
+import com.ilia_zusik.weatherapp.domain.utils.UiResource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class WeatherViewModel @Inject constructor(private val repository: WeatherRepository) :
+class WeatherViewModel @Inject constructor(
+    private val weatherUseCase: WeatherUseCase
+) :
     ViewModel() {
 
-    private val weather = MutableSharedFlow<String>()
+    private val _weather: MutableStateFlow<UiResource<DisplayWeatherModel>> =
+        MutableStateFlow(UiResource.Loading())
+    val weather: StateFlow<UiResource<DisplayWeatherModel>> = _weather
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val resource = weather.map { it }
-        .flatMapLatest { repository.weather(it) }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Loading())
-
-    val isLoading = resource.map {
-        it.isLoading
-    }
-    val isFail = resource.map {
-        it.isError
-    }
-    val data = resource.map {
-        it.dataOrNull
-    }
-
-    fun submit(cityName: String) {
+    fun getWeather(cityName: String) {
         viewModelScope.launch {
-            weather.emit(cityName)
+            weatherUseCase.weather(cityName).collectLatest { resource ->
+                when (resource) {
+                    is UiResource.Error -> _weather.emit(UiResource.Error(resource.message!!))
+                    is UiResource.Loading -> _weather.emit(UiResource.Loading())
+                    is UiResource.Success -> _weather.emit(UiResource.Success(resource.data!!))
+                }
+            }
         }
     }
 }

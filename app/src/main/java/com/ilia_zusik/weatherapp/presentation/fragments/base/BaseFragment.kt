@@ -4,12 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.viewbinding.ViewBinding
-import com.ilia_zusik.weatherapp.domain.utils.Resource
 
 typealias inflater<T> = (LayoutInflater, ViewGroup?, Boolean) -> T
 
@@ -41,24 +38,6 @@ abstract class BaseFragment<
         super.onViewCreated(view, savedInstanceState)
         initialize()
         observe()
-    }
-
-    protected fun <T> LiveData<Resource<T>>.resHandler(
-        loading: (loading: Boolean) -> Unit,
-        success: (data: T) -> Unit
-    ) {
-        this.observe(viewLifecycleOwner) { resource ->
-            loading.invoke(resource is Resource.Loading)
-            when (resource) {
-                is Resource.Error -> Toast.makeText(
-                    requireContext(),
-                    resource.message ?: "Unknown error",
-                    Toast.LENGTH_LONG
-                ).show()
-                is Resource.Loading -> {}
-                is Resource.Success -> resource.data?.let { success.invoke(it) }
-            }
-        }
     }
 
     open fun observe() {

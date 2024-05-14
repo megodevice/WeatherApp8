@@ -1,4 +1,4 @@
-package com.ilia_zusik.weatherapp.data.models.display
+package com.ilia_zusik.weatherapp.domain.models
 
 data class DisplayWeatherModel(
     val date: String,

@@ -1,29 +1,28 @@
-package com.ilia_zusik.weatherapp.domain.weather
+package com.ilia_zusik.weatherapp.data.repositories
 
 import com.ilia_zusik.weatherapp.data.models.current.WeatherModel
-import com.ilia_zusik.weatherapp.data.models.display.DisplayWeatherModel
-import com.ilia_zusik.weatherapp.data.remote.WeatherApi
-import com.ilia_zusik.weatherapp.domain.base.BaseRepository
-import com.ilia_zusik.weatherapp.domain.utils.Resource
-import javax.inject.Inject
-import com.ilia_zusik.weatherapp.data.models.display.DisplayWeatherHourModel
 import com.ilia_zusik.weatherapp.data.models.hours.WeatherHourModel
 import com.ilia_zusik.weatherapp.data.models.room.RoomWeather
 import com.ilia_zusik.weatherapp.data.models.room.RoomWeatherHour
+import com.ilia_zusik.weatherapp.data.remote.WeatherApi
 import com.ilia_zusik.weatherapp.data.room.WeatherDao
+import com.ilia_zusik.weatherapp.data.utils.DataUtils
+import com.ilia_zusik.weatherapp.domain.models.DisplayWeatherHourModel
+import com.ilia_zusik.weatherapp.domain.models.DisplayWeatherModel
+import com.ilia_zusik.weatherapp.domain.repositories.WeatherRepository
+import com.ilia_zusik.weatherapp.domain.utils.UiResource
+import com.ilia_zusik.weatherapp.domain.utils.toDisplayWeatherHourModel
+import com.ilia_zusik.weatherapp.domain.utils.toDisplayWeatherModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import javax.inject.Inject
 
-class WeatherRepository @Inject constructor(
+class WeatherRepositoryImpl @Inject constructor(
     private val api: WeatherApi,
     private val dao: WeatherDao
-) : BaseRepository() {
-
-    fun weather(cityName: String): Flow<Resource<DisplayWeatherModel>> = flow {
-        emit(Resource.Loading())
+) : WeatherRepository {
+    override fun weather(cityName: String): Flow<UiResource<DisplayWeatherModel>> = flow {
+        emit(UiResource.Loading())
         try {
             loadWeather { emit(it) }
             // Здесь нужна проверка если прошло мало времени не делать запрос
@@ -35,44 +34,26 @@ class WeatherRepository @Inject constructor(
                     val responseHourly = api.getHourlyWeather(id)
                     val dataHourly = arrayListOf<DisplayWeatherHourModel>()
                     if (responseHourly.isSuccessful && responseHourly.body() != null && responseHourly.code() in 200..300) {
-                        with(responseHourly.body()!!) {
-                            list.forEach {
-                                dataHourly.add(
-                                    DisplayWeatherHourModel(
-                                        hour = it.dt_txt.substring(11, 16),
-                                        rainPercentage = getRainPercentage(it.pop),
-                                        imageUrl = getImageUrl(it.weather[0].icon)
-                                    )
-                                )
-                            }
-
-                        }
+                        responseHourly.body()!!.list.forEach { dataHourly.add(it.toDisplayWeatherHourModel()) }
                     } else {
-                        emit(Resource.Error("Unsuccessful response: ${responseHourly.code()}"))
+                        emit(UiResource.Error("Unsuccessful response: ${responseHourly.code()}"))
                     }
 
-                    val result = DisplayWeatherModel(
-                        cityName = name,
-                        cityInitial = getCityInitial(name),
-                        temperature = "${temp.temp.toInt()}°",
-                        hourly = dataHourly,
-                        date = convertDate(dateUnix * 1000 + timeZoneOffset)
-                    )
+                    val result = this.toDisplayWeatherModel(dataHourly)
 
                     saveWeather(this, responseHourly.body()?.list)
 
-
-                    emit(Resource.Success(result))
+                    emit(UiResource.Success(result))
                 }
             } else {
-                emit(Resource.Error("Unsuccessful response: ${response.code()}"))
+                emit(UiResource.Error("Unsuccessful response: ${response.code()}"))
             }
         } catch (e: Exception) {
-            emit(Resource.Error(e.localizedMessage ?: "Unknown error!"))
+            emit(UiResource.Error(e.localizedMessage ?: "Unknown error!"))
         }
     }
 
-    private suspend fun loadWeather(emit: suspend (Resource<DisplayWeatherModel>) -> Unit) {
+    private suspend fun loadWeather(emit: suspend (UiResource<DisplayWeatherModel>) -> Unit) {
         val weather = dao.getWeather()
         val hourly = dao.getHourly()
         val hours = ArrayList<DisplayWeatherHourModel>()
@@ -89,9 +70,9 @@ class WeatherRepository @Inject constructor(
                 }
             }
             emit(
-                Resource.Success(
+                UiResource.Success(
                     DisplayWeatherModel(
-                        date = convertDate(roomWeather.dateUnix),
+                        date = DataUtils.convertDate(roomWeather.dateUnix),
                         cityName = roomWeather.cityName,
                         cityInitial = roomWeather.cityInitial,
                         temperature = roomWeather.temperature,
@@ -108,7 +89,7 @@ class WeatherRepository @Inject constructor(
         dao.saveWeather(
             RoomWeather(
                 cityName = weatherModel.name,
-                cityInitial = getCityInitial(weatherModel.name),
+                cityInitial = DataUtils.getCityInitial(weatherModel.name),
                 temperature = "${weatherModel.temp.temp.toInt()}°",
                 dateUnix = weatherModel.dateUnix * 1000 + weatherModel.timeZoneOffset
             )
@@ -119,8 +100,8 @@ class WeatherRepository @Inject constructor(
                 roomHours.add(
                     RoomWeatherHour(
                         hour = it.dt_txt.substring(11, 16),
-                        rainPercentage = getRainPercentage(it.pop),
-                        imageUrl = getImageUrl(it.weather[0].icon),
+                        rainPercentage = DataUtils.getRainPercentage(it.pop),
+                        imageUrl = DataUtils.getImageUrl(it.weather[0].icon),
                         dateUnix = it.dateUnix * 1000 + weatherModel.timeZoneOffset
                     )
                 )
@@ -128,15 +109,5 @@ class WeatherRepository @Inject constructor(
             dao.saveHours(roomHours)
         }
     }
-
-    private fun convertDate(millis: Long) =
-        SimpleDateFormat("MM.dd - HH:mm", Locale.ROOT).format(Date(millis))
-
-    private fun getCityInitial(cityName: String) =
-        cityName.substring(0, 3).uppercase(Locale.ROOT)
-
-    private fun getRainPercentage(pop: Double) = "${(pop * 100).toInt()}%"
-
-    private fun getImageUrl(imageId: String) = "https://openweathermap.org/img/wn/$imageId@2x.png"
 
 }

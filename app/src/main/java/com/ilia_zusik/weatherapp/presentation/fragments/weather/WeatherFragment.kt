@@ -7,10 +7,10 @@ import androidx.lifecycle.lifecycleScope
 import com.ilia_zusik.weatherapp.databinding.FragmentWeatherBinding
 import com.ilia_zusik.weatherapp.presentation.adapters.WeatherHourlyAdapter
 import com.ilia_zusik.weatherapp.presentation.fragments.base.BaseFragment
+import com.ilia_zusik.weatherapp.domain.utils.UiResource
 import com.ilia_zusik.weatherapp.presentation.viewModels.WeatherViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class WeatherFragment : BaseFragment<
@@ -24,30 +24,37 @@ class WeatherFragment : BaseFragment<
 
     override fun observe() {
         super.observe()
-        viewModel.data.onEach {
-            binding.apply {
-                it?.let { weather ->
-                    tvCityFull.text = weather.cityName
-                    tvCityInitial.text = weather.cityInitial
-                    tvTemp.text = weather.temperature
-                    tvDay.text = weather.date
-                    adapter.submitList(weather.hourly)
+        lifecycleScope.launch {
+            viewModel.weather.collect { uiResource ->
+                binding.animLoading.isVisible = uiResource is UiResource.Loading
+                when (uiResource) {
+                    is UiResource.Error -> {
+                        Toast.makeText(requireContext(), uiResource.message, Toast.LENGTH_LONG)
+                            .show()
+                    }
+
+                    is UiResource.Loading -> {}
+                    is UiResource.Success -> {
+                        binding.apply {
+                            uiResource.data?.let { weather ->
+                                tvCityFull.text = weather.cityName
+                                tvCityInitial.text = weather.cityInitial
+                                tvTemp.text = weather.temperature
+                                tvDay.text = weather.date
+                                adapter.submitList(weather.hourly)
+                            }
+                        }
+
+                    }
                 }
+
             }
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
-
-        viewModel.isFail.onEach {
-            it?.let { Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show() }
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
-
-        viewModel.isLoading.onEach {
-            binding.animLoading.isVisible = it
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
+        }
     }
 
-    override fun initialize() = with(binding) {
+    override fun initialize() {
         super.initialize()
-        rvHourly.adapter = adapter
-        viewModel.submit("Bishkek")
+        binding.rvHourly.adapter = adapter
+        viewModel.getWeather("Bishkek")
     }
 }

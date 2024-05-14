@@ -6,8 +6,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import com.ilia_zusik.weatherapp.data.models.display.DisplayWeatherHourModel
 import com.ilia_zusik.weatherapp.databinding.ItemWeatherBinding
+import com.ilia_zusik.weatherapp.domain.models.DisplayWeatherHourModel
 
 class WeatherHourlyAdapter :
     ListAdapter<DisplayWeatherHourModel, WeatherHourlyAdapter.WeatherStepViewHolder>(DIFF_UTIL_CALLBACK) {
